@@ -8,8 +8,6 @@ const useMovieList = () => {
         revalidateOnReconnect: false,
     });
 
-    //console.log(data, error, isLoading);
-
     return {
         data,
         error,

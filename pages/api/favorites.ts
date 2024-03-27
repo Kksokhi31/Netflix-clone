@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import serverAuth from "@/lib/serverAuth";
 
 const prismadb = new PrismaClient();
@@ -9,11 +9,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).end();
     }
     try{
-        await serverAuth(req, res);
-        const movies = await prismadb.movie.findMany();
-        return res.status(200).json(movies);
+        const { currentUser } = await serverAuth(req,res);
+        const favoriteMovies = await prismadb.movie.findMany({
+            where: {
+                id: {
+                    in: currentUser?.favoriteIds,
+                }
+            }
+        });
+        return res.status(200).json(favoriteMovies);
     }
-    catch(error) {
+    catch(error){
         console.log(error);
         return res.status(400).end();
     }
